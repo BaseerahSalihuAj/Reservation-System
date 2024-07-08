@@ -1,78 +1,74 @@
 import csv
-import os
+
 tables = [
-    {'number': 1, 'seats': 2},
-    {'number': 2, 'seats': 4},
-    {'number': 3, 'seats': 6},
-    {'number': 4, 'seats': 8},
-    {'number': 5, 'seats': 10},
+    {
+        "number": 1, "seats": 4,
+    },
+    {
+        "number": 2, "seats": 3,
+    },
+    {
+        "number": 3, "seats": 6,
+    },
+     {
+        "number": 4, "seats": 5,
+    },
 ]
 
-reservations_file = 'reservation_file.csv'
 
+# def view_tables():
+#     for table in tables:
+#         print(table)
+# view_tables()
 
-def view_tables(tables):
-    for table in tables:
-        print(table)
+reservation_file = 'reserved_seats.csv'
+def make_reservation(tables, reservation_file):
+    name = input("Enter your name: ")
+    contact = input("Enter your address: ")
+    party_size = int(input("Enter number of people: "))
+    date = input("Enter date YYYY-MM-DD: ")
+    start_time = input("Enter start time HH:MM: ")
+    end_time = input("Enter end time HH:MM: ")
 
-view_tables(tables)
-
-def make_reservation(tables,reservation):
-    name = input("Enter your name:") 
-    contact = input("Enter your contact number:")
-    party_size = int(input("Enter number of people:"))
-    date = input("Enter reservation date(YYYY-MM-DD):")
-    start_time = input("Enter reservation start time(HH:MM):")
-    end_time = input("Enter reservation end time (HH:MM)")
-
-    available_tables = [table for table in tables if table['seats'] >= party_size]
+    available_tables= [table for table in tables if table["seats"] >= party_size]
     if not available_tables:
-     print("No available tables for your party size.")
-     return
-    print("available tables")
-    for table in available_tables:
-       print(f"Table {table['number']} - seats: {table['seats']}")
-
-    #table to reserve from available list
-    table_number = int(input("Enter table number to reserve:"))
-
-    if table_number not in [table['number'] for table in available_tables]:
-        print("invalid table number.")
+        print("table is not available")
         return
+    print(available_tables)
+    for table in available_tables:
+        print(f"Table: {table["number"]} - Seat: {table["seats"]}")
     
-    new_row = [table_number, name, contact, party_size, date, start_time, end_time]
-    file_exists = os.path.isfile(reservations_file)
+    table_number= int(input("Enter table_number: "))
+    if table_number not in [table["number"] for table in available_tables]:
+        print("invalid table number")
+        return
+    new_row = [table_number, name, party_size, date, start_time, end_time]
+    header = ['table_number', 'name', 'party_size', 'date', 'start_time', 'end_time']
+    # header_present = False
+    # try:
+    with open(reservation_file, mode = "a", newline="") as file:
+        writer = csv.writer(file)
+        if not header:
+            writer.writerow(header)
+        writer.writerow(new_row)
+        print(header)
+        print(f"Table {table_number} reserved successfully for {name} on {date}")
+    # except Exception as e:
+        # print(f"Error making reservation")
+        # pass
+make_reservation(tables, reservation_file)
+
+def view_reservation(reservation_file):
     try:
-        with open(reservations_file, mode='a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(new_row)
-            if not file_exists:
-                writer.writerow(["table number", "name", "party size"])
-            writer.writerow(new_row)
-        print(f"table {table_number} reserved successfully for {name} on {date} from {start_time} to {end_time}.")
-    except Exception as e:
-        print(f"Error saving reservation:{e}")
-
-    # reservation = {'name': name, 'party_size': party_size}
-
-    # print(f"Table {table_number} reserved successfully for {name}.")
-
-# def cancel_reservation(reservations):
-#     pass
-make_reservation(tables,reservations_file)
-
-def view_reservation(reservations):
-    try:
-        with open(reservations_file, "r") as file:
-         reader = csv.reader(file)
-         reservations = list(reader)
-         for reservation in reservations:
-             print(reservation)
+        with open(reservation_file, "r") as file:
+            reader = csv.reader(file)
+            reservations = list(reader)
+            for reservation in reservations:
+                print(reservation)      
     except Exception as e:
         print("Error found")
         pass
-
-# make_reservation(tables,reservations_file)
+# view_reservation(reservation_file)
 
 
 def cancel_reservation(reservation_file):
@@ -93,7 +89,6 @@ def cancel_reservation(reservation_file):
                 print('reservation not found')
 # cancel_reservation(reservation_file)
 
-
 def daily_summary(reservation_file):
     date = input("Enter date of reservation: ")
     try:
@@ -111,6 +106,8 @@ def daily_summary(reservation_file):
         print('Invalid date')
         pass
 # daily_summary(reservation_file)
+
+
 
 def modify_reservation(reservation_file):
     date = input("Enter the date of the reservation to modify (format: YYYY-MM-DD): ")
@@ -159,8 +156,4 @@ def modify_reservation(reservation_file):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-modify_reservation(reservations_file)
-
-
-    
-    
+modify_reservation(reservation_file)
